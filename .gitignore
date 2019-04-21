@@ -1,2 +1,4 @@
 *.hex
+*.pyc
+__pycache__
 .vscode
