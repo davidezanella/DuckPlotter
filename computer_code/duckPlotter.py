@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 import serial
 import json
+import sys
 import time
+from gCodeParser import parse
 
 serialDev = '/dev/tty20'
 baudRate = 9600
@@ -20,12 +22,17 @@ def readData():
     return ser.readline()
 
 def main():
-    data = {
-        "type": "move"
-    }
+    if len(sys.argv) > 1:
+        gcode_file = sys.argv[1]
+    else:
+        gcode_file = input("Name of the gcode file: ")
 
-    for i in range(5):
-        sendData(data)
+    gcode_file = open(gcode_file,'r')
+    gcode = gcode_file.read()
+    data = parse(gcode)
+
+    for instr in data:
+        sendData(instr)
         time.sleep(0.5)
         print("Read: " + readData())
         
