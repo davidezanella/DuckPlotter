@@ -10,7 +10,7 @@
 
     go into computer_code folder and run 
     
-    `pip instal -r requirements.txt`
+    `pip install -r requirements.txt`
 
 ### Generate the Gcode file from an image
 
@@ -20,12 +20,15 @@
 * Ungroup the layers of the image
 * Choose the best layer and fix it removing or adding pixels
 
-If you need help doing these steps follow [this video](https://www.youtube.com/watch?v=U248SJcxRWA).
+    If you need help doing these steps follow [this video](https://www.youtube.com/watch?v=U248SJcxRWA).
 
 * Finally export Gcode from your image using the "Extensions" tab and selecting the option "Generate Gcode"
 
 ### Start the plotting process
 
+* Execute the duckPlotter program:
+
+    `python duckPlotter.py [gcode-file] [serial-port]`
 
 ## Used libraries:
 * [ArduinoJson](https://arduinojson.org)
