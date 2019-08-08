@@ -30,5 +30,9 @@
 
     `python duckPlotter.py [gcode-file] [serial-port]`
 
-## Used libraries:
+## Used libraries
 * [ArduinoJson](https://arduinojson.org)
+
+## Used Hardware
+* Arduino Mega 2560
+* Pololu Stepper Motor Driver
