@@ -5,20 +5,19 @@ import sys
 import time
 from gCodeParser import parse
 
-serialDev = '/dev/tty20'
 baudRate = 9600
 
 
 def sendData(ser, obj):
     data = json.dumps(obj) + "\n"
     for d in data:
-        ser.write(str(d))
+        ser.write(str(d).encode())
 
-    print("Sent:" + data)
+    print("Sent: " + data)
 
 
 def readData(ser):
-    return ser.readline()
+    return str(ser.readline())
 
 
 def main():
@@ -35,12 +34,30 @@ def main():
     gcode = gcode_file.read()
     data = parse(gcode)
 
-    ser = serial.Serial(serialDev, baudRate, timeout=1)
+    ser = serial.Serial(serialDev, baudRate, timeout=None)
+
+    time.sleep(2) # wait for Arduino
+
+    reset = [{
+        'type': 'reset'
+    }]
+
+    data = reset + data
 
     for instr in data:
         sendData(ser, instr)
-        time.sleep(0.5)
-        print("Read: " + readData(ser))
+        time.sleep(1)
+        result = readData(ser)
+        print("Read: " + result)
+
+        #just for debug
+        if instr['type'] == "pen":
+            input("Waiting...")
+
+        #print debug code from the Arduino
+        while "Done" not in result:
+            print("\t" + str(result))
+            result = readData(ser)
 
     ser.close()
 
