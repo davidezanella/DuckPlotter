@@ -1,33 +1,19 @@
-#include <Servo.h>
-#include <math.h>
 
-#include "ShieldDriver.h"
+#include "DuckPlotter.h"
 
-#define X 0
-#define Y 1
-
-#define penUP 50
-#define penDOWN 40
-
-#define maxStepsX 12436 //maximum number of steps on the X axis
-#define maxStepsY 21766 //maximum number of steps on the Y axis
-
-#define numMinSteps 5 //minimum number of steps done
-
-const float scaleXfactor = maxStepsX / 210.0;
-const float scaleYfactor = maxStepsY / 297.0;
-
-const float incrX = numMinSteps / scaleXfactor;
-const float incrY = numMinSteps / scaleYfactor;
-
-float discards[2] = {0, 0};
-
-ShieldDriver driver = ShieldDriver();
+/**
+  Constructor
+*/
+DuckPlotter::DuckPlotter()
+{
+  penMotor.attach(SERVO_PIN);
+  movePen(false);
+}
 
 /**
    Check if a number is near enough to a target one
 */
-bool near(float point, float target)
+bool DuckPlotter::near(float point, float target)
 {
   const float sens = 0.3;
   return (target - sens <= point && point <= target + sens);
@@ -36,7 +22,7 @@ bool near(float point, float target)
 /**
    Reset the position of all the stepper motors
 */
-void reset()
+void DuckPlotter::reset()
 {
   driver.reset();
 }
@@ -44,7 +30,7 @@ void reset()
 /**
    Convert a millimenter value to a stepper one in base of the axix
 */
-float millimetersToSteps(float millimeters, int axis)
+float DuckPlotter::millimetersToSteps(float millimeters, int axis)
 {
   float scale = scaleXfactor; //X scale factor
   if (axis == Y)
@@ -56,14 +42,14 @@ float millimetersToSteps(float millimeters, int axis)
 /**
    Move the stepper motor of the axis by some millimeter value
 */
-void moveMotor(float mill, int axis)
+void DuckPlotter::moveMotor(float mill, int axis)
 {
   float stepsFloat = millimetersToSteps(mill, axis);
   int steps = floor(stepsFloat);
   float discard = stepsFloat - ((float) steps);
 
   discards[axis] += discard;
-  if (discards[axis] >= 1) 
+  if (discards[axis] >= 1)
   {
     steps += 1;
     discards[axis] -= 1;
@@ -82,7 +68,7 @@ void moveMotor(float mill, int axis)
 /**
    Make a linear movement
 */
-void moveLinear(float fromX, float fromY, float toX, float toY)
+void DuckPlotter::moveLinear(float fromX, float fromY, float toX, float toY)
 {
   //find the equation of the line (y = mx + q)
   float m = (toY - fromY) / (toX - fromX);
@@ -120,7 +106,7 @@ void moveLinear(float fromX, float fromY, float toX, float toY)
 /**
    Make an arc movement
 */
-void moveArc(float fromX, float fromY, float toX, float toY, float radius, float centerX, float centerY, bool clockwise)
+void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float radius, float centerX, float centerY, bool clockwise)
 {
   // x = radius * cos(t) + centerX AND y = radius * sin(t) + centerY
   // t = atan((y - centerY) / (x - centerX))
@@ -157,20 +143,9 @@ void moveArc(float fromX, float fromY, float toX, float toY, float radius, float
 }
 
 /**
-   Put up or down the pen
-*/
-void movePen(bool down, Servo penMotor)
-{
-  if (down)
-    penMotor.write(penDOWN);
-  else
-    penMotor.write(penUP);
-}
-
-/**
    Make an arc movement
 */
-void moveArc(float fromX, float fromY, float toX, float toY, float offsetX, float offsetY, bool clockwise)
+void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float offsetX, float offsetY, bool clockwise)
 {
   //find the radius
   float radius = sqrt(pow(offsetX, 2) + pow(offsetY, 2));
@@ -183,7 +158,7 @@ void moveArc(float fromX, float fromY, float toX, float toY, float offsetX, floa
 /**
    Make an arc movement
 */
-void moveArc(float fromX, float fromY, float toX, float toY, float radius, bool clockwise)
+void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float radius, bool clockwise)
 {
   //find the centerX and centerY
   float radsq = radius * radius;
@@ -195,4 +170,15 @@ void moveArc(float fromX, float fromY, float toX, float toY, float radius, bool 
   float centerY = y3 + sqrt(radsq - pow(q / 2, 2) * ((fromX - toX) / q));
 
   moveArc(fromX, fromY, toX, toY, radius, centerX, centerY, clockwise);
+}
+
+/**
+   Put up or down the pen
+*/
+void DuckPlotter::movePen(bool down)
+{
+  if (down)
+    penMotor.write(penDOWN);
+  else
+    penMotor.write(penUP);
 }

@@ -50,10 +50,6 @@ def main():
         result = readData(ser)
         print("Read: " + result)
 
-        #just for debug
-        if instr['type'] == "pen":
-            input("Waiting...")
-
         #print debug code from the Arduino
         while "Done" not in result:
             print("\t" + str(result))
