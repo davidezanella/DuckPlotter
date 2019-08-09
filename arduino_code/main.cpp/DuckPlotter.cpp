@@ -2,10 +2,14 @@
 #include "DuckPlotter.h"
 
 /**
-  Constructor
+  Init function. Cannot be a contructor beacuse of the Servo class
 */
-DuckPlotter::DuckPlotter()
+void DuckPlotter::init()
 {
+  driver = ShieldDriver();
+  discards[X] = 0;
+  discards[Y] = 0;
+
   penMotor.attach(SERVO_PIN);
   movePen(false);
 }
@@ -82,7 +86,7 @@ void DuckPlotter::moveLinear(float fromX, float fromY, float toX, float toY)
     float nextX = x;
     float nextY = y;
 
-    if (x != toX) // increment x
+    if (!near(x, toX)) // increment x
     {
       int sign = (x < toX) ? 1 : -1;
       nextX += incrX * sign;
@@ -93,7 +97,6 @@ void DuckPlotter::moveLinear(float fromX, float fromY, float toX, float toY)
       int sign = (y < toY) ? 1 : -1;
       nextY += incrY * sign;
     }
-
 
     //move motors
     if (canMove(nextX, X))

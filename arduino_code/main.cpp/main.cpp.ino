@@ -3,12 +3,12 @@
 
 #define BAUD 9600
 
-DuckPlotter plotter = DuckPlotter();
-
 float lastX, lastY, lastZ;
+DuckPlotter plotter = DuckPlotter();
 
 void setup() {
   Serial.begin(BAUD);
+  plotter.init();
 
   lastX = lastY = lastZ = 0;
 }
@@ -28,7 +28,6 @@ void start() {
     }
 
     String type = doc["type"];
-
 
     if (type == "reset") {
       plotter.reset();

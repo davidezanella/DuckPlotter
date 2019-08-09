@@ -4,6 +4,7 @@
 
 #include <Servo.h>
 #include <math.h>
+#include <Arduino.h>
 
 #include "ShieldDriver.h"
 
@@ -12,8 +13,8 @@
 
 #define SERVO_PIN 32
 
-#define penUP 10
-#define penDOWN 95
+#define penUP 145
+#define penDOWN 85
 
 #define millimitersX 210.0
 #define millimitersY 297.0
@@ -23,16 +24,17 @@
 
 #define numMinSteps 5 //minimum number of steps done
 
+#define scaleXfactor (maxStepsX / millimitersX)
+#define scaleYfactor (maxStepsY / millimitersY)
+    
+#define incrX (numMinSteps / scaleXfactor)
+#define incrY (numMinSteps / scaleYfactor)
+
 
 class DuckPlotter
 {
   public:
-    //Constructor
-    DuckPlotter();
-
-    Servo penMotor;
-    ShieldDriver driver = ShieldDriver();
-
+    void init();
 
     //Reset motor positions
     void reset();
@@ -48,14 +50,11 @@ class DuckPlotter
     
     void movePen(bool down);
 
-  private:
-    const float scaleXfactor = maxStepsX / millimitersX;
-    const float scaleYfactor = maxStepsY / millimitersY;
+  private:    
+    Servo penMotor;    
+    ShieldDriver driver;
     
-    const float incrX = numMinSteps / scaleXfactor;
-    const float incrY = numMinSteps / scaleYfactor;
-    
-    float discards[2] = {0, 0};
+    float discards[2];
 
     bool near(float point, float target);
     bool canMove(float position, int axi);
