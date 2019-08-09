@@ -32,7 +32,8 @@
 
 ## Used libraries
 * [ArduinoJson](https://arduinojson.org)
+* [Servo by Michael Margolis, Arduino](https://platformio.org/lib/show/883/Servo)
 
-## Used Hardware
+## Used hardware
 * Arduino Mega 2560
-* Pololu Stepper Motor Driver
+* RAMPS 1.4 (RepRap Arduino MEGA Pololu Shield)
