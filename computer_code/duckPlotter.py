@@ -4,6 +4,7 @@ import json
 import sys
 import time
 from gCodeParser import parse
+from tqdm import tqdm
 
 baudRate = 9600
 
@@ -13,7 +14,7 @@ def sendData(ser, obj):
     for d in data:
         ser.write(str(d).encode())
 
-    print("Sent: " + data)
+    tqdm.write("Sent: " + data)
 
 
 def readData(ser):
@@ -44,15 +45,15 @@ def main():
 
     data = reset + data
 
-    for instr in data:
+    for instr in tqdm(data):
         sendData(ser, instr)
         time.sleep(1)
         result = readData(ser)
-        print("Read: " + result)
+        tqdm.write("Read: " + result)
 
         #print debug code from the Arduino
         while "Done" not in result:
-            print("\t" + str(result))
+            tqdm.write("\t" + str(result))
             result = readData(ser)
 
     ser.close()
