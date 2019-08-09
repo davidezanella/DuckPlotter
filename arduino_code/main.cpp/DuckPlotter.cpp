@@ -94,9 +94,12 @@ void DuckPlotter::moveLinear(float fromX, float fromY, float toX, float toY)
       nextY += incrY * sign;
     }
 
+
     //move motors
-    moveMotor(nextX - x, X);
-    moveMotor(nextY - y, Y);
+    if (canMove(nextX, X))
+      moveMotor(nextX - x, X);
+    if (canMove(nextY, Y))
+      moveMotor(nextY - y, Y);
 
     x = nextX;
     y = nextY;
@@ -133,8 +136,10 @@ void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float 
     float nextY = radius * sin(t) + centerY;
 
     //move motors
-    moveMotor(nextX - x, X);
-    moveMotor(nextY - y, Y);
+    if (canMove(nextX, X))
+      moveMotor(nextX - x, X);
+    if (canMove(nextY, Y))
+      moveMotor(nextY - y, Y);
 
     t += incr;
     x = nextX;
@@ -181,4 +186,17 @@ void DuckPlotter::movePen(bool down)
     penMotor.write(penDOWN);
   else
     penMotor.write(penUP);
+}
+
+/**
+  Check if it is possible to perform a movement without exceeding the limits
+*/
+bool DuckPlotter::canMove(float position, int axi)
+{
+  if (axi == X)
+    return position >= 0 && position <= millimitersX;
+  else if (axi == Y)
+    return position >= 0 && position <= millimitersY;
+
+  return false;
 }

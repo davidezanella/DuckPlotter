@@ -58,6 +58,7 @@ class DuckPlotter
     float discards[2] = {0, 0};
 
     bool near(float point, float target);
+    bool canMove(float position, int axi);
 };
 
 #endif
