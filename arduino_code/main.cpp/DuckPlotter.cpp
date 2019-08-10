@@ -17,10 +17,10 @@ void DuckPlotter::init()
 /**
    Check if a number is near enough to a target one
 */
-bool DuckPlotter::near(float point, float target)
+bool DuckPlotter::near(double point, double target, bool linear)
 {
-  const float sens = 0.3;
-  return (target - sens <= point && point <= target + sens);
+  const double sens = incrX * (linear ? 1 : 28);
+  return (target - sens < point && point < target + sens);
 }
 
 /**
@@ -34,9 +34,9 @@ void DuckPlotter::reset()
 /**
    Convert a millimenter value to a stepper one in base of the axix
 */
-float DuckPlotter::millimetersToSteps(float millimeters, int axis)
+double DuckPlotter::millimetersToSteps(double millimeters, int axis)
 {
-  float scale = scaleXfactor; //X scale factor
+  double scale = scaleXfactor; //X scale factor
   if (axis == Y)
     scale = scaleYfactor; //Y scale factor
 
@@ -46,11 +46,11 @@ float DuckPlotter::millimetersToSteps(float millimeters, int axis)
 /**
    Move the stepper motor of the axis by some millimeter value
 */
-void DuckPlotter::moveMotor(float mill, int axis)
+void DuckPlotter::moveMotor(double mill, int axis)
 {
-  float stepsFloat = millimetersToSteps(mill, axis);
-  int steps = floor(stepsFloat);
-  float discard = stepsFloat - ((float) steps);
+  double stepsdouble = millimetersToSteps(mill, axis);
+  int steps = floor(stepsdouble);
+  double discard = stepsdouble - ((double) steps);
 
   discards[axis] += discard;
   if (discards[axis] >= 1)
@@ -72,60 +72,65 @@ void DuckPlotter::moveMotor(float mill, int axis)
 /**
    Make a linear movement
 */
-void DuckPlotter::moveLinear(float fromX, float fromY, float toX, float toY)
+Position DuckPlotter::moveLinear(Position from, Position to)
 {
   //find the equation of the line (y = mx + q)
-  float m = (toY - fromY) / (toX - fromX);
-  float q = fromY - (m * fromX);
+  double m = (to.y - from.y) / (to.x - from.x);
+  double q = from.y - (m * from.x);
 
-  float x = fromX;
-  float y = fromY;
+  Position pos;
+  pos.x = from.x;
+  pos.y = from.y;
 
-  while (!near(x, toX) || !near(y, toY))
+  while (!near(pos.x, to.x, true) || !near(pos.y, to.y, true))
   {
-    float nextX = x;
-    float nextY = y;
+    Position next;
+    next.x = pos.x;
+    next.y = pos.y;
 
-    if (!near(x, toX)) // increment x
+    if (!near(pos.x, to.x, true)) // increment x
     {
-      int sign = (x < toX) ? 1 : -1;
-      nextX += incrX * sign;
-      nextY = m * nextX + q;
+      int sign = (pos.x < to.x) ? 1 : -1;
+      next.x += incrX * sign;
+      next.y = m * next.x + q;
     }
     else // increment y
     {
-      int sign = (y < toY) ? 1 : -1;
-      nextY += incrY * sign;
+      int sign = (pos.y < to.y) ? 1 : -1;
+      next.y += incrY * sign;
     }
 
     //move motors
-    if (canMove(nextX, X))
-      moveMotor(nextX - x, X);
-    if (canMove(nextY, Y))
-      moveMotor(nextY - y, Y);
+    if (canMove(next.x, X))
+      moveMotor(next.x - pos.x, X);
+    if (canMove(next.y, Y))
+      moveMotor(next.y - pos.y, Y);
 
-    x = nextX;
-    y = nextY;
+    pos.x = next.x;
+    pos.y = next.y;
   }
+
+  return pos;
 }
 
 /**
    Make an arc movement
 */
-void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float radius, float centerX, float centerY, bool clockwise)
+Position DuckPlotter::moveArc(Position from, Position to, double radius, Position center, bool clockwise)
 {
   // x = radius * cos(t) + centerX AND y = radius * sin(t) + centerY
   // t = atan((y - centerY) / (x - centerX))
 
-  float x = fromX;
-  float y = fromY;
-  float incr = 0.01;
+  Position pos;
+  pos.x = from.x;
+  pos.y = from.y;
+  double incr = 0.05 / (2 * PI * radius); //millimeters of the circonference
   incr = (clockwise ? -incr : incr);
 
-  float dx = (x - centerX);
-  float dy = (y - centerY);
+  double dx = (pos.x - center.x);
+  double dy = (pos.y - center.y);
 
-  float t = atan(dy / dx);
+  double t = atan(dy / dx);
 
   //chose the right quadrant
   if (dx < 0)
@@ -133,51 +138,56 @@ void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float 
     t += PI;
   }
 
-  while (!near(x, toX) || !near(y, toY))
+  while (!near(pos.x, to.x, false) || !near(pos.y, to.y, false))
   {
-    float nextX = radius * cos(t) + centerX;
-    float nextY = radius * sin(t) + centerY;
+    Position next;
+    next.x = radius * cos(t) + center.x;
+    next.y = radius * sin(t) + center.y;
 
     //move motors
-    if (canMove(nextX, X))
-      moveMotor(nextX - x, X);
-    if (canMove(nextY, Y))
-      moveMotor(nextY - y, Y);
+    if (canMove(next.x, X))
+      moveMotor(next.x - pos.x, X);
+    if (canMove(next.y, Y))
+      moveMotor(next.y - pos.y, Y);
 
     t += incr;
-    x = nextX;
-    y = nextY;
+    pos.x = next.x;
+    pos.y = next.y;
   }
+  
+  return pos;
 }
 
 /**
    Make an arc movement
 */
-void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float offsetX, float offsetY, bool clockwise)
+Position DuckPlotter::moveArc(Position from, Position to, Position offset, bool clockwise)
 {
   //find the radius
-  float radius = sqrt(pow(offsetX, 2) + pow(offsetY, 2));
-  float centerX = fromX + offsetX;
-  float centerY = fromY + offsetY;
+  double radius = sqrt(pow(offset.x, 2) + pow(offset.y, 2));
+  Position center;
+  center.x = from.x + offset.x;
+  center.y = from.y + offset.y;
 
-  moveArc(fromX, fromY, toX, toY, radius, centerX, centerY, clockwise);
+  return moveArc(from, to, radius, center, clockwise);
 }
 
 /**
    Make an arc movement
 */
-void DuckPlotter::moveArc(float fromX, float fromY, float toX, float toY, float radius, bool clockwise)
+Position DuckPlotter::moveArc(Position from, Position to, double radius, bool clockwise)
 {
   //find the centerX and centerY
-  float radsq = radius * radius;
-  float q = sqrt(pow(fromX - toX, 2) + pow(fromY - toY, 2));
-  float x3 = (fromX + toX) / 2;
-  float centerX = x3 + sqrt(radsq - pow(q / 2, 2) * ((fromY - toY) / q));
+  double radsq = radius * radius;
+  double q = sqrt(pow(from.x - to.x, 2) + pow(from.y - to.y, 2));
+  double x3 = (from.x + to.x) / 2;
+  Position center;
+  center.x = x3 + sqrt(radsq - pow(q / 2, 2) * ((from.y - to.y) / q));
 
-  float y3 = (fromY + toY) / 2;
-  float centerY = y3 + sqrt(radsq - pow(q / 2, 2) * ((fromX - toX) / q));
+  double y3 = (from.y + to.y) / 2;
+  center.y = y3 + sqrt(radsq - pow(q / 2, 2) * ((from.x - to.x) / q));
 
-  moveArc(fromX, fromY, toX, toY, radius, centerX, centerY, clockwise);
+  return moveArc(from, to, radius, center, clockwise);
 }
 
 /**
@@ -194,7 +204,7 @@ void DuckPlotter::movePen(bool down)
 /**
   Check if it is possible to perform a movement without exceeding the limits
 */
-bool DuckPlotter::canMove(float position, int axi)
+bool DuckPlotter::canMove(double position, int axi)
 {
   if (axi == X)
     return position >= 0 && position <= millimitersX;

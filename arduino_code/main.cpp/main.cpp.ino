@@ -3,14 +3,15 @@
 
 #define BAUD 9600
 
-float lastX, lastY, lastZ;
+Position last;
 DuckPlotter plotter = DuckPlotter();
 
 void setup() {
   Serial.begin(BAUD);
   plotter.init();
 
-  lastX = lastY = lastZ = 0;
+  last.x = 0;
+  last.y = 0;
 }
 
 void start() {
@@ -34,25 +35,25 @@ void start() {
     }
     else if (type == "movement") {
       String moveType = doc["move_type"];
-      float toX = doc["toX"];
-      float toY = doc["toY"];
+      Position to;
+      to.x = doc["toX"];
+      to.y = doc["toY"];
       bool clockwise = doc["clockwise"];
       if (moveType == "linear") {
-        plotter.moveLinear(lastX, lastY, toX, toY);
+        last = plotter.moveLinear(last, to);
       }
       else if (moveType == "arc") {
         if (doc.containsKey("offsetX")) {
-          float offsetX = doc["offsetX"];
-          float offsetY = doc["offsetY"];
-          plotter.moveArc(lastX, lastY, toX, toY, offsetX, offsetY, clockwise);
+          Position offset;
+          offset.x = doc["offsetX"];
+          offset.y = doc["offsetY"];
+          last = plotter.moveArc(last, to, offset, clockwise);
         }
         else {
-          float radius = doc["radius"];
-          plotter.moveArc(lastX, lastY, toX, toY, radius, clockwise);
+          double radius = doc["radius"];
+          last = plotter.moveArc(last, to, radius, clockwise);
         }
       }
-      lastX = toX;
-      lastY = toY;
     }
     else if (type == "pen") {
       bool down = doc["down"];

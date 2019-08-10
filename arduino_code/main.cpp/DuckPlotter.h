@@ -13,16 +13,16 @@
 
 #define SERVO_PIN 32
 
-#define penUP 145
-#define penDOWN 85
+#define penUP 135
+#define penDOWN 65
 
 #define millimitersX 210.0
 #define millimitersY 297.0
 
 #define maxStepsX 12436 //maximum number of steps on the X axis
-#define maxStepsY 21766 //maximum number of steps on the Y axis
+#define maxStepsY (maxStepsX / millimitersX * millimitersY) //21766 //maximum number of steps on the Y axis
 
-#define numMinSteps 5 //minimum number of steps done
+#define numMinSteps 1 //minimum number of steps done
 
 #define scaleXfactor (maxStepsX / millimitersX)
 #define scaleYfactor (maxStepsY / millimitersY)
@@ -30,6 +30,11 @@
 #define incrX (numMinSteps / scaleXfactor)
 #define incrY (numMinSteps / scaleYfactor)
 
+
+struct Position {
+   double x;
+   double y;
+};
 
 class DuckPlotter
 {
@@ -39,14 +44,14 @@ class DuckPlotter
     //Reset motor positions
     void reset();
 
-    float millimetersToSteps(float millimeters, int axis);
-    void moveMotor(float mill, int axis);
+    double millimetersToSteps(double millimeters, int axis);
+    void moveMotor(double mill, int axis);
     
-    void moveLinear(float fromX, float fromY, float toX, float toY);
+    Position moveLinear(Position from, Position to);
     
-    void moveArc(float fromX, float fromY, float toX, float toY, float radius, float centerX, float centerY, bool clockwise);
-    void moveArc(float fromX, float fromY, float toX, float toY, float offsetX, float offsetY, bool clockwise);
-    void moveArc(float fromX, float fromY, float toX, float toY, float radius, bool clockwise);
+    Position moveArc(Position from, Position to, double radius, Position center, bool clockwise);
+    Position moveArc(Position from, Position to, Position offset, bool clockwise);
+    Position moveArc(Position from, Position to, double radius, bool clockwise);
     
     void movePen(bool down);
 
@@ -54,10 +59,10 @@ class DuckPlotter
     Servo penMotor;    
     ShieldDriver driver;
     
-    float discards[2];
+    double discards[2];
 
-    bool near(float point, float target);
-    bool canMove(float position, int axi);
+    bool near(double point, double target, bool linear);
+    bool canMove(double position, int axi);
 };
 
 #endif
