@@ -32,6 +32,14 @@
     
     The `-c` option allow to continue plotting without resetting to the initial position
 
+* You can split a gcode file in more files in order to avoid overheatings:
+
+    `python gcodeSplitter.py [gcode-file] [max-lines]`
+    
+    The `max-lines` option allow to split the gcode file every `max-lines` lines. (Default value: 2500)
+
+    All required gcode files will be generated. They have to be executed in order, with the `-c` option from the second file. 
+
 ## Used libraries
 * [ArduinoJson](https://arduinojson.org)
 * [Servo by Michael Margolis, Arduino](https://platformio.org/lib/show/883/Servo)
