@@ -13,8 +13,8 @@
 
 #define SERVO_PIN 32
 
-#define penUP 135
-#define penDOWN 65
+#define penUP 5
+#define penDOWN 85
 
 #define millimitersX 210.0
 #define millimitersY 297.0
@@ -29,6 +29,8 @@
     
 #define incrX (numMinSteps / scaleXfactor)
 #define incrY (numMinSteps / scaleYfactor)
+
+#define incrT 0.008 //millimenets of the circumference dove by each step of an arc movement
 
 
 struct Position {
@@ -61,8 +63,10 @@ class DuckPlotter
     
     double discards[2];
 
-    bool near(double point, double target, bool linear);
+    bool nearLinear(double point, double target);
+    bool nearArc(double t, double finalT, double incr);
     bool canMove(double position, int axi);
+    double calculateRadOfPoint(Position pos, Position center);
 };
 
 #endif

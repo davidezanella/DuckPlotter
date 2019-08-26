@@ -15,12 +15,46 @@ void DuckPlotter::init()
 }
 
 /**
-   Check if a number is near enough to a target one
+   Check if a point is near enough to a target one for a linear movement
 */
-bool DuckPlotter::near(double point, double target, bool linear)
+bool DuckPlotter::nearLinear(double point, double target)
 {
-  const double sens = incrX * (linear ? 1 : 28);
-  return (target - sens < point && point < target + sens);
+  return (target - incrX < point && point < target + incrX);
+}
+
+/**
+   Check if a point is near enough to a target one for an arc movement
+*/
+bool DuckPlotter::nearArc(double t, double finalT, double incr)
+{
+  incr = abs(incr);
+
+  if (t < 0)
+    t += (PI * 2);
+    
+  if (finalT < 0)
+    finalT += (PI * 2);
+  
+  return (finalT - incr < t && t < finalT + incr);
+}
+
+/**
+  Calculate the radians of a point in a circle
+*/
+double DuckPlotter::calculateRadOfPoint(Position pos, Position center)
+{
+  double dx = (pos.x - center.x);
+  double dy = (pos.y - center.y);
+
+  double t = atan(dy / dx);
+
+  //choose the right quadrant
+  if (dx < 0)
+  {
+    t += PI;
+  }
+
+  return t;
 }
 
 /**
@@ -32,7 +66,7 @@ void DuckPlotter::reset()
 }
 
 /**
-   Convert a millimenter value to a stepper one in base of the axix
+   Convert a millimenter value to a stepper one in base of the axis
 */
 double DuckPlotter::millimetersToSteps(double millimeters, int axis)
 {
@@ -82,13 +116,13 @@ Position DuckPlotter::moveLinear(Position from, Position to)
   pos.x = from.x;
   pos.y = from.y;
 
-  while (!near(pos.x, to.x, true) || !near(pos.y, to.y, true))
+  while (!nearLinear(pos.x, to.x) || !nearLinear(pos.y, to.y))
   {
     Position next;
     next.x = pos.x;
     next.y = pos.y;
 
-    if (!near(pos.x, to.x, true)) // increment x
+    if (!nearLinear(pos.x, to.x)) // increment x
     {
       int sign = (pos.x < to.x) ? 1 : -1;
       next.x += incrX * sign;
@@ -124,21 +158,13 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, Positio
   Position pos;
   pos.x = from.x;
   pos.y = from.y;
-  double incr = 0.05 / (2 * PI * radius); //millimeters of the circonference
+  double incr = incrT / radius; //millimeters of the circonference converted to radians
   incr = (clockwise ? -incr : incr);
 
-  double dx = (pos.x - center.x);
-  double dy = (pos.y - center.y);
-
-  double t = atan(dy / dx);
-
-  //chose the right quadrant
-  if (dx < 0)
-  {
-    t += PI;
-  }
-
-  while (!near(pos.x, to.x, false) || !near(pos.y, to.y, false))
+  double t = calculateRadOfPoint(pos, center);
+  double finalT = calculateRadOfPoint(to, center);
+      
+  while (!nearArc(t, finalT, incr))
   {
     Position next;
     next.x = radius * cos(t) + center.x;
@@ -179,13 +205,37 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, bool cl
 {
   //find the centerX and centerY
   double radsq = radius * radius;
-  double q = sqrt(pow(from.x - to.x, 2) + pow(from.y - to.y, 2));
+  double q = sqrt(pow(to.x - from.x, 2) + pow(to.y - from.y, 2));
+
+  Position centerA;
+  Position centerB;
+  
   double x3 = (from.x + to.x) / 2;
-  Position center;
-  center.x = x3 + sqrt(radsq - pow(q / 2, 2) * ((from.y - to.y) / q));
+  double x3b = sqrt(radsq - pow(q / 2.0, 2)) * ((from.y - to.y) / q);
+  centerA.x = x3 + x3b;
+  centerB.x = x3 - x3b;
 
   double y3 = (from.y + to.y) / 2;
-  center.y = y3 + sqrt(radsq - pow(q / 2, 2) * ((from.x - to.x) / q));
+  double y3b = sqrt(radsq - pow(q / 2.0, 2)) * ((to.x - from.x) / q);
+  centerA.y = y3 + y3b;
+  centerB.y = y3 - y3b;
+
+  double tStartA = calculateRadOfPoint(from, centerA);
+  double tEndA = calculateRadOfPoint(to, centerA);
+
+  double tStartB = calculateRadOfPoint(from, centerB);
+  double tEndB = calculateRadOfPoint(to, centerB);
+
+  Position center;
+  //choose the right center
+  if((clockwise && radius > 0) || (!clockwise && radius < 0)) //shortest arc
+  {
+    center = (tStartA > tEndA) ? centerA : centerB; 
+  }
+  else
+  {
+    center = (tStartA < tEndA) ? centerA : centerB; 
+  }
 
   return moveArc(from, to, radius, center, clockwise);
 }
