@@ -67,6 +67,7 @@ class DuckPlotter
     bool nearArc(double t, double finalT, double incr);
     bool canMove(double position, int axi);
     double calculateRadOfPoint(Position pos, Position center);
+    double fixRadians(double rad);
 };
 
 #endif

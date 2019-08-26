@@ -22,6 +22,17 @@ bool DuckPlotter::nearLinear(double point, double target)
   return (target - incrX < point && point < target + incrX);
 }
 
+double DuckPlotter::fixRadians(double rad)
+{
+  if (rad < 0)
+    return rad + (PI * 2);
+
+  if (rad > 2 * PI)
+    return rad - (PI * 2);
+
+  return rad;
+}
+
 /**
    Check if a point is near enough to a target one for an arc movement
 */
@@ -29,11 +40,8 @@ bool DuckPlotter::nearArc(double t, double finalT, double incr)
 {
   incr = abs(incr);
 
-  if (t < 0)
-    t += (PI * 2);
-    
-  if (finalT < 0)
-    finalT += (PI * 2);
+  t = fixRadians(t);
+  finalT = fixRadians(finalT);
   
   return (finalT - incr < t && t < finalT + incr);
 }
