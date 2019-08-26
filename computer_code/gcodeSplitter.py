@@ -12,12 +12,12 @@ def main():
     else:
         gcode_file_name = input("Name of the gcode file to split: ")
     if len(sys.argv) > 2:
-        n_lines = sys.argv[2]
+        n_lines = int(sys.argv[2])
 
     gcode_file = open(gcode_file_name, 'r')
     gcode = gcode_file.readlines()
 
-    n_files = math.ceil(len(gcode) / int(n_lines))
+    n_files = math.ceil(len(gcode) / n_lines)
     base_name = os.path.splitext(gcode_file_name)[0]
 
     for i in range(n_files):
