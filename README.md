@@ -28,7 +28,9 @@
 
 * Execute the duckPlotter program:
 
-    `python duckPlotter.py [gcode-file] [serial-port]`
+    `python duckPlotter.py [gcode-file] [serial-port] [-c]`
+    
+    The `-c` option allow to continue plotting without resetting to the initial position
 
 ## Used libraries
 * [ArduinoJson](https://arduinojson.org)

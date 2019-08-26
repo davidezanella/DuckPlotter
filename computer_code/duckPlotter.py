@@ -43,7 +43,8 @@ def main():
         'type': 'reset'
     }]
 
-    data = reset + data
+    if '-c' not in sys.argv:
+        data = reset + data
 
     for instr in tqdm(data):
         sendData(ser, instr)
