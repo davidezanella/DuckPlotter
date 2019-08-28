@@ -62,3 +62,14 @@ def parseCmd(cmd):
         }
 
     return None
+
+def findLastPosition(lines):
+    for line in reversed(lines):
+        cmd = list(filter(None, line.split(' ')))
+        if(len(cmd) == 0):
+            continue
+        instr = parseCmd(cmd)
+        if instr != None and instr['type'] == 'movement':
+            return instr['toX'], instr['toY']
+    
+    return 0, 0

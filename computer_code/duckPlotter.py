@@ -3,8 +3,9 @@ import serial
 import json
 import sys
 import time
-from gCodeParser import parse
+from gCodeParser import parse, findLastPosition
 from tqdm import tqdm
+import argparse
 
 baudRate = 9600
 
@@ -22,20 +23,19 @@ def readData(ser):
 
 
 def main():
-    if len(sys.argv) > 1:
-        gcode_file = sys.argv[1]
-    else:
-        gcode_file = input("Name of the gcode file: ")
-    if len(sys.argv) > 2:
-        serialDev = sys.argv[2]
-    else:
-        serialDev = input("Port connected with arduino: ")
+    parser = argparse.ArgumentParser(description='DuckPlotter pc program. Send g-code instructions to Arduino.')
+    
+    parser.add_argument('file_name', help='g-code file to plot')
+    parser.add_argument('serial_port', help='serial port of Arduino')
+    parser.add_argument('--continue', action='store', dest='prev_file_name', help='previous g-code file')
+    
+    args = parser.parse_args()
 
-    gcode_file = open(gcode_file, 'r')
+    gcode_file = open(args.file_name, 'r')
     gcode = gcode_file.read()
     data = parse(gcode)
 
-    ser = serial.Serial(serialDev, baudRate, timeout=None)
+    ser = None# serial.Serial(args.serial_port, baudRate, timeout=None)
 
     time.sleep(2) # wait for Arduino
 
@@ -43,8 +43,21 @@ def main():
         'type': 'reset'
     }]
 
-    if '-c' not in sys.argv:
+    sync = [{
+        'type': 'sync',
+        'x': 0,
+        'y': 0
+    }]
+
+    if args.prev_file_name is None:
         data = reset + data
+    else:
+        prev_file = open(args.prev_file_name, 'r')
+        lines = prev_file.readlines()
+        x, y = findLastPosition(lines)
+        sync[0]['x'], sync[0]['y'] = x, y
+        data = sync + data
+        print("Resuming from: x = " + str(x) + ", y = " + str(y))
 
     for instr in tqdm(data):
         sendData(ser, instr)
