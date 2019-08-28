@@ -28,17 +28,34 @@
 
 * Execute the duckPlotter program:
 
-    `python duckPlotter.py [gcode-file] [serial-port] [-c]`
+    ```
+    usage: duckPlotter.py [-h] [--continue PREV_FILE_NAME] file_name serial_port
+
+    DuckPlotter pc program. Send g-code instructions to Arduino.
+
+    positional arguments:
+    file_name                       g-code file to plot
+    serial_port                     serial port of Arduino
+
+    optional arguments:
+    -h, --help                      show this help message and exit
+    --continue PREV_FILE_NAME       previous g-code file
+
+    ```
     
-    The `-c` option allow to continue plotting without resetting to the initial position
+    Example of usage:
+
+    `python3 duckPlotter.py my-gcode-file.gcode /dev/ttyACM0`
+
+    The `--continue` option allow to continue plotting without resetting to the initial position. It needs to know the previous file.
 
 * You can split a gcode file in more files in order to avoid overheatings:
 
-    `python gcodeSplitter.py [gcode-file] [max-lines]`
+    `python gcodeSplitter.py gcode-file [max-lines]`
     
     The `max-lines` option allow to split the gcode file every `max-lines` lines. (Default value: 2500)
 
-    All required gcode files will be generated. They have to be executed in order, with the `-c` option from the second file. 
+    All required gcode files will be generated. They have to be executed in order, with the `--continue` option specifying the previous g-code file. 
 
 ## Used libraries
 * [ArduinoJson](https://arduinojson.org)
