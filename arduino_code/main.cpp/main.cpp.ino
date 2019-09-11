@@ -34,8 +34,8 @@ void start() {
       plotter.reset();
     }
     else if (type == "sync") {
-      last.x = doc['x'];
-      last.y = doc['y']
+      last.x = doc["x"];
+      last.y = doc["y"];
     }
     else if (type == "movement") {
       String moveType = doc["move_type"];

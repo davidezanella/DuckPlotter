@@ -13,8 +13,8 @@
 
 #define SERVO_PIN 32
 
-#define penUP 5
-#define penDOWN 85
+#define penUP 30
+#define penDOWN 90
 
 #define millimitersX 210.0
 #define millimitersY 297.0

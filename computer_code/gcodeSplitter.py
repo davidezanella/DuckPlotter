@@ -22,7 +22,6 @@ def main():
 
     for i in range(n_files):
         file_code = gcode[i * n_lines:(i+1) * n_lines]
-        file_code = ['M03\n'] + file_code + ['M05\n'] #move down the pen at the start and down at the end
 
         file_name = base_name + "_" + (str(i+1)).zfill(4) + ".gcode"
 
@@ -31,7 +30,7 @@ def main():
 
 
     print(str(n_files) + " gcode files generated.")
-    print("Execute the first one and then the others with the '-c' option without moving or resetting the plotter.")
+    print("Execute the first one and then the others with the '--continue' option followed by the name of the previous file without moving or resetting the plotter.")
 
 
 if __name__ == "__main__":
