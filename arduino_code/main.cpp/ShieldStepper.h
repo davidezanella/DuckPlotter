@@ -13,6 +13,8 @@ class ShieldStepper
 
     void makeSteps(int _nSteps);
 
+    void setTime(unsigned long _step_time);
+
     void reset();
 
   private:
@@ -21,6 +23,7 @@ class ShieldStepper
     int enablePin;
     int stopPin;
     int invertDir;
+    unsigned long step_time;
 
     void step();
 

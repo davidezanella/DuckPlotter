@@ -1,6 +1,8 @@
 
 #include "DuckPlotter.h"
 
+#define DEFAULT_STEP_TIME 1000 //microseconds
+
 /**
   Init function. Cannot be a contructor beacuse of the Servo class
 */
@@ -10,13 +12,25 @@ void DuckPlotter::init()
   discards[X] = 0;
   discards[Y] = 0;
 
+  setStepTime(DEFAULT_STEP_TIME,DEFAULT_STEP_TIME);
+
   penMotor.attach(SERVO_PIN);
   movePen(false);
 }
 
 /**
+  Set delay in microseconds between each step of both the motorX and motorY
+*/
+//TO TEST
+void DuckPlotter::setStepTime(unsigned long step_timeX, unsigned long step_timeY)
+{
+  driver.motorX.setTime(step_timeX);
+  driver.motorY.setTime(step_timeY);
+}
+/**
    Check if a point is near enough to a target one for a linear movement
 */
+
 bool DuckPlotter::nearLinear(double point, double target)
 {
   return (target - incrX < point && point < target + incrX);
@@ -42,7 +56,7 @@ bool DuckPlotter::nearArc(double t, double finalT, double incr)
 
   t = fixRadians(t);
   finalT = fixRadians(finalT);
-  
+
   return (finalT - incr < t && t < finalT + incr);
 }
 
@@ -171,7 +185,7 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, Positio
 
   double t = calculateRadOfPoint(pos, center);
   double finalT = calculateRadOfPoint(to, center);
-      
+
   while (!nearArc(t, finalT, incr))
   {
     Position next;
@@ -188,7 +202,7 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, Positio
     pos.x = next.x;
     pos.y = next.y;
   }
-  
+
   return pos;
 }
 
@@ -217,7 +231,7 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, bool cl
 
   Position centerA;
   Position centerB;
-  
+
   double x3 = (from.x + to.x) / 2;
   double x3b = sqrt(radsq - pow(q / 2.0, 2)) * ((from.y - to.y) / q);
   centerA.x = x3 + x3b;
@@ -238,11 +252,11 @@ Position DuckPlotter::moveArc(Position from, Position to, double radius, bool cl
   //choose the right center
   if((clockwise && radius > 0) || (!clockwise && radius < 0)) //shortest arc
   {
-    center = (tStartA > tEndA) ? centerA : centerB; 
+    center = (tStartA > tEndA) ? centerA : centerB;
   }
   else
   {
-    center = (tStartA < tEndA) ? centerA : centerB; 
+    center = (tStartA < tEndA) ? centerA : centerB;
   }
 
   return moveArc(from, to, radius, center, clockwise);

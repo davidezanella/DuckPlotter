@@ -40,7 +40,8 @@ void ShieldStepper::step()
 {
   //make one step setting high and low the state
   digitalWrite(stepPin, HIGH);
-  delay(1);
+  //delay(1);
+  delayMicroseconds(step_time);
   digitalWrite(stepPin, LOW);
 }
 
@@ -59,6 +60,15 @@ void ShieldStepper::makeSteps(int _nSteps)
     step();
   }
 }
+
+//------------------------------------------
+//to test
+void ShieldStepper::setTime(unsigned long _step_time)
+{
+  step_time = _step_time;
+}
+
+//------------------------------------------
 
 /**
    Reset the position of the motor

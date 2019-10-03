@@ -26,7 +26,7 @@
 
 #define scaleXfactor (maxStepsX / millimitersX)
 #define scaleYfactor (maxStepsY / millimitersY)
-    
+
 #define incrX (numMinSteps / scaleXfactor)
 #define incrY (numMinSteps / scaleYfactor)
 
@@ -48,19 +48,21 @@ class DuckPlotter
 
     double millimetersToSteps(double millimeters, int axis);
     void moveMotor(double mill, int axis);
-    
+
     Position moveLinear(Position from, Position to);
-    
+
     Position moveArc(Position from, Position to, double radius, Position center, bool clockwise);
     Position moveArc(Position from, Position to, Position offset, bool clockwise);
     Position moveArc(Position from, Position to, double radius, bool clockwise);
-    
+
+    void setStepTime(unsigned long step_timeX,unsigned long step_timeY);
+
     void movePen(bool down);
 
-  private:    
-    Servo penMotor;    
+  private:
+    Servo penMotor;
     ShieldDriver driver;
-    
+
     double discards[2];
 
     bool nearLinear(double point, double target);
