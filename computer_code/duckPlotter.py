@@ -35,7 +35,7 @@ def main():
     gcode = gcode_file.read()
     data = parse(gcode)
 
-    ser = None# serial.Serial(args.serial_port, baudRate, timeout=None)
+    ser = serial.Serial(args.serial_port, baudRate, timeout=None)
 
     time.sleep(2) # wait for Arduino
 
