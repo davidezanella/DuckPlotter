@@ -1,7 +1,7 @@
 
 #include "DuckPlotter.h"
 
-#define DEFAULT_STEP_TIME 1000 //microseconds
+#define DEFAULT_STEP_TIME 800 //microseconds
 
 /**
   Init function. Cannot be a contructor beacuse of the Servo class
@@ -21,12 +21,13 @@ void DuckPlotter::init()
 /**
   Set delay in microseconds between each step of both the motorX and motorY
 */
-//TO TEST
+
 void DuckPlotter::setStepTime(unsigned long step_timeX, unsigned long step_timeY)
 {
   driver.motorX.setTime(step_timeX);
   driver.motorY.setTime(step_timeY);
 }
+
 /**
    Check if a point is near enough to a target one for a linear movement
 */

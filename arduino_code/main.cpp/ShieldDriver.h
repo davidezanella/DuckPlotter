@@ -76,9 +76,10 @@ class ShieldDriver
     //declare all the stepper motors
     ShieldStepper motorX = ShieldStepper(X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_STOP_PIN, X_INVERT_DIR);
     ShieldStepper motorY = ShieldStepper(Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_STOP_PIN, Y_INVERT_DIR);
-    ShieldStepper motorZ = ShieldStepper(Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_STOP_PIN, Z_INVERT_DIR);
-    ShieldStepper motorE = ShieldStepper(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, E_STOP_PIN, E_INVERT_DIR);
-    ShieldStepper motorQ = ShieldStepper(Q_STEP_PIN, Q_DIR_PIN, Q_ENABLE_PIN, Q_STOP_PIN, Q_INVERT_DIR);
+    //in our project only motorX and motorY have been used, uncomment to enable:
+    //ShieldStepper motorZ = ShieldStepper(Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_STOP_PIN, Z_INVERT_DIR);
+    //ShieldStepper motorE = ShieldStepper(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, E_STOP_PIN, E_INVERT_DIR);
+    //ShieldStepper motorQ = ShieldStepper(Q_STEP_PIN, Q_DIR_PIN, Q_ENABLE_PIN, Q_STOP_PIN, Q_INVERT_DIR);
 
   private:
 
