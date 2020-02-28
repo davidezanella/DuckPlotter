@@ -1,7 +1,7 @@
 
 #include "DuckPlotter.h"
 
-#define DEFAULT_STEP_TIME 800 //microseconds
+#define DEFAULT_STEP_TIME 300 //microseconds
 
 /**
   Init function. Cannot be a contructor beacuse of the Servo class
@@ -12,7 +12,7 @@ void DuckPlotter::init()
   discards[X] = 0;
   discards[Y] = 0;
 
-  setStepTime(DEFAULT_STEP_TIME,DEFAULT_STEP_TIME);
+  setStepTime(DEFAULT_STEP_TIME, DEFAULT_STEP_TIME);
 
   penMotor.attach(SERVO_PIN);
   movePen(false);
