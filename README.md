@@ -4,6 +4,10 @@ Arduino plotter made with a 3d printer capable to draw G-Code on paper.
 
 ![Image of the Duckplotter](duckplotter.jpg)
 
+Video demo of the DuckPlotter in action:
+
+[![Video demo of the DuckPlotter in action](https://img.youtube.com/vi/qxwlFX-WB54/0.jpg)](https://www.youtube.com/watch?v=qxwlFX-WB54)
+
 ## How to use DuckPlotter
 
 ### Configure the system
@@ -12,7 +16,7 @@ Arduino plotter made with a 3d printer capable to draw G-Code on paper.
 * Send code to Arduino
 * Install all python requirements:
 
-    go into computer_code folder and run 
+    go into `computer_code` folder and run 
     
     `pip install -r requirements.txt`
 
@@ -68,3 +72,7 @@ Arduino plotter made with a 3d printer capable to draw G-Code on paper.
 ## Used hardware
 * Arduino Mega 2560
 * RAMPS 1.4 (RepRap Arduino MEGA Pololu Shield)
+
+## Authors
+- [Davide Dorigoni](https://github.com/DavDori)
+- [Davide Zanella](https://github.com/davidezanella)
