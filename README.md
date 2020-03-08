@@ -16,11 +16,17 @@ Video demo of the DuckPlotter in action:
 * Send code to Arduino
 * Install all python requirements:
 
-    go into `computer_code` folder and run 
-    
+    go into `computer_code` folder and run
+
     `pip install -r requirements.txt`
 
 ### Generate the Gcode file from an image
+
+#### First solution
+
+* Download and install the program [`Image to gcode - DP`](https://github.com/davidezanella/image-to-gcode-DP) created ad hoc for the DuckPlotter.
+
+#### Second solution
 
 * Download and install the [Inkscape](https://inkscape.org) program and its [Laser Tool Plug-In](http://jtechphotonics.com/?page_id=2012)
 * Open your image with Inkscape
@@ -50,7 +56,7 @@ Video demo of the DuckPlotter in action:
     --continue PREV_FILE_NAME       previous g-code file
 
     ```
-    
+
     Example of usage:
 
     `python3 duckPlotter.py my-gcode-file.gcode /dev/ttyACM0`
@@ -60,10 +66,10 @@ Video demo of the DuckPlotter in action:
 * You can split a gcode file in more files in order to avoid overheatings:
 
     `python gcodeSplitter.py gcode-file [max-lines]`
-    
+
     The `max-lines` option allow to split the gcode file every `max-lines` lines. (Default value: 2500)
 
-    All required gcode files will be generated. They have to be executed in order, with the `--continue` option specifying the previous g-code file. 
+    All required gcode files will be generated. They have to be executed in order, with the `--continue` option specifying the previous g-code file.
 
 ## Used libraries
 * [ArduinoJson](https://arduinojson.org)
