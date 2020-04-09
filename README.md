@@ -6,7 +6,7 @@ Arduino plotter made with a 3d printer capable to draw G-Code on paper.
 
 Video demo of the DuckPlotter in action:
 
-[![Video demo of the DuckPlotter in action](https://img.youtube.com/vi/qxwlFX-WB54/0.jpg)](https://www.youtube.com/watch?v=qxwlFX-WB54)
+[![Video demo of the DuckPlotter in action](https://img.youtube.com/vi/VcAsxya50rk/0.jpg)](https://www.youtube.com/watch?v=VcAsxya50rk)
 
 ## How to use DuckPlotter
 
